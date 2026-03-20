@@ -27,7 +27,6 @@ return new class extends Migration
         }
 
         Schema::table('availabilities', function (Blueprint $table) {
-            $table->dropIndex(['dentist_id', 'day_of_week']);
             $table->unique(['dentist_id', 'day_of_week'], 'availabilities_dentist_day_unique');
         });
     }
@@ -39,7 +38,6 @@ return new class extends Migration
     {
         Schema::table('availabilities', function (Blueprint $table) {
             $table->dropUnique('availabilities_dentist_day_unique');
-            $table->index(['dentist_id', 'day_of_week']);
         });
     }
 };
