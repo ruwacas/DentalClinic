@@ -13,9 +13,9 @@ return new class extends Migration
     public function up(): void
     {
         $duplicateGroups = DB::table('availabilities')
-            ->select('dentist_id', 'day_of_week', DB::raw('MAX(id) as keep_id'), DB::raw('COUNT(*) as total'))
+            ->select('dentist_id', 'day_of_week', DB::raw('MAX(id) as keep_id'))
             ->groupBy('dentist_id', 'day_of_week')
-            ->having('total', '>', 1)
+            ->havingRaw('COUNT(*) > 1')
             ->get();
 
         foreach ($duplicateGroups as $group) {
