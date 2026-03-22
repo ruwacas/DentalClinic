@@ -1,0 +1,18 @@
+---
+deployment:
+  tasks:
+    # Update this to your cPanel account path.
+    - export DEPLOYPATH=/home/your-cpanel-user/public_html
+
+    # Sync project files except local/environment artifacts.
+    - /bin/rsync -av --delete --exclude='.git' --exclude='node_modules' --exclude='.env' ./ $DEPLOYPATH/
+
+    # Install PHP dependencies optimized for production.
+    - /opt/cpanel/composer/bin/composer install --no-dev --prefer-dist --optimize-autoloader -d $DEPLOYPATH
+
+    # Laravel cache/config refresh.
+    - /usr/local/bin/php $DEPLOYPATH/artisan config:clear
+    - /usr/local/bin/php $DEPLOYPATH/artisan route:clear
+    - /usr/local/bin/php $DEPLOYPATH/artisan view:clear
+    - /usr/local/bin/php $DEPLOYPATH/artisan config:cache
+    - /usr/local/bin/php $DEPLOYPATH/artisan route:cache
