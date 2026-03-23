@@ -3,7 +3,7 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>{{ $title ?? 'Dental Clinic Reservations' }}</title>
+    <title>{{ $title ?? 'Aquino Dental Clinic Appointment Management System' }}</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=Plus+Jakarta+Sans:wght@500;600;700;800&display=swap" rel="stylesheet">
@@ -17,7 +17,7 @@
     <div class="page-shell">
         <header class="topbar">
             <div>
-                <h1 class="brand">Mountain Pearl Dental Clinic</h1>
+                <h1 class="brand">Aquino Dental Clinic Appointment Management System</h1>
                 <p class="subbrand">Where Every Smile Shines Like a Pearl</p>
             </div>
             @auth

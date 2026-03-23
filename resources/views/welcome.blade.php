@@ -1,8 +1,8 @@
-@extends('layouts.app', ['title' => 'Mountain Pearl Dental Clinic'])
+@extends('layouts.app', ['title' => 'Aquino Dental Clinic Appointment Management System'])
 
 @section('content')
 <section class="hero-mountain">
-    <p class="hero-kicker">Mountain Pearl Dental Clinic</p>
+    <p class="hero-kicker">Aquino Dental Clinic Appointment Management System</p>
     <h2>Where Every Smile Shines Like a Pearl.</h2>
     <p>Modern dental care with a calm, highland-inspired experience. Book in minutes and enjoy attentive care from consultation to follow-up.</p>
     <div class="hero-actions">
@@ -112,7 +112,7 @@
                 src="https://www.google.com/maps?q=16.4119385,120.5978973&z=17&output=embed"
                 loading="lazy"
                 referrerpolicy="no-referrer-when-downgrade"
-                title="Mountain Pearl Dental Clinic Location">
+                title="Aquino Dental Clinic Appointment Management System Location">
             </iframe>
         </div>
         <div class="location-actions">
