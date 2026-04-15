@@ -1,18 +1,23 @@
 ---
 deployment:
   tasks:
-    # Update this to your cPanel account path.
-    - export DEPLOYPATH=/home/your-cpanel-user/public_html
+    - export APPPATH=/home/xbwpuvvj/repositories/DentalClinic
+    - export DEPLOYPATH=/home/xbwpuvvj/public_html
+    - /bin/mkdir -p "$DEPLOYPATH"
 
-    # Sync project files except local/environment artifacts.
-    - /bin/rsync -av --delete --exclude='.git' --exclude='node_modules' --exclude='.env' ./ $DEPLOYPATH/
+    # Install production dependencies in the application path.
+    - /opt/alt/php82/usr/bin/php /home/xbwpuvvj/bin/composer install --no-dev --prefer-dist --optimize-autoloader -d "$APPPATH"
 
-    # Install PHP dependencies optimized for production.
-    - /opt/cpanel/composer/bin/composer install --no-dev --prefer-dist --optimize-autoloader -d $DEPLOYPATH
+    # Refresh Laravel caches.
+    - /opt/alt/php82/usr/bin/php "$APPPATH/artisan" optimize:clear
+    - /opt/alt/php82/usr/bin/php "$APPPATH/artisan" config:cache
+    - /opt/alt/php82/usr/bin/php "$APPPATH/artisan" route:cache
+    - /opt/alt/php82/usr/bin/php "$APPPATH/artisan" view:cache
 
-    # Laravel cache/config refresh.
-    - /usr/local/bin/php $DEPLOYPATH/artisan config:clear
-    - /usr/local/bin/php $DEPLOYPATH/artisan route:clear
-    - /usr/local/bin/php $DEPLOYPATH/artisan view:clear
-    - /usr/local/bin/php $DEPLOYPATH/artisan config:cache
-    - /usr/local/bin/php $DEPLOYPATH/artisan route:cache
+    # Publish only /public to public_html.
+    - /bin/rsync -a --delete "$APPPATH/public/" "$DEPLOYPATH/"
+
+    # Rewrite index.php paths so public_html can bootstrap Laravel from APPPATH.
+    - /bin/sed -i "s|__DIR__.'/../storage/framework/maintenance.php'|'$APPPATH/storage/framework/maintenance.php'|" "$DEPLOYPATH/index.php"
+    - /bin/sed -i "s|__DIR__.'/../vendor/autoload.php'|'$APPPATH/vendor/autoload.php'|" "$DEPLOYPATH/index.php"
+    - /bin/sed -i "s|__DIR__.'/../bootstrap/app.php'|'$APPPATH/bootstrap/app.php'|" "$DEPLOYPATH/index.php"
