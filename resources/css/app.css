@@ -202,6 +202,48 @@ body::after {
     box-shadow: var(--shadow-sm);
 }
 
+.services-box {
+    display: grid;
+    gap: 1.5rem;
+}
+
+.services-category-block {
+    display: grid;
+    gap: 0.9rem;
+}
+
+.services-items-grid {
+    display: grid;
+    gap: 0.9rem;
+}
+
+.service-item {
+    padding: 1rem 1.05rem;
+    border: 1px solid #dce8ee;
+    border-radius: 14px;
+    background: #fbfeff;
+}
+
+.service-item h4 {
+    margin: 0 0 0.45rem;
+}
+
+.service-item ul {
+    margin: 0.35rem 0 0;
+    padding-left: 1.2rem;
+}
+
+.service-item li {
+    margin: 0.2rem 0;
+    color: var(--muted);
+}
+
+@media (min-width: 900px) {
+    .services-items-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+}
+
 h2,
 h3 {
     margin: 0 0 0.5rem;

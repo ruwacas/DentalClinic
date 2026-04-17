@@ -28,6 +28,7 @@
                     @if (auth()->user()->role === 'patient')
                         <p class="patient-greeting patient-greeting-right">{{ auth()->user()->name }}</p>
                     @endif
+                    <a class="role-link" href="{{ route('services') }}">Our Services</a>
                     <a class="role-link" href="{{ route('home') }}#location">Location</a>
                     @if (auth()->user()->role !== 'dentist')
                         <nav class="role-nav">
@@ -50,6 +51,7 @@
             @else
                 <div class="topbar-actions">
                     <a class="role-link" href="{{ route('home') }}">Home</a>
+                    <a class="role-link" href="{{ route('services') }}">Our Services</a>
                     <a class="role-link" href="{{ route('home') }}#location">Location</a>
                     <a class="role-link" href="{{ route('login.form') }}">Login</a>
                     <a class="btn" href="{{ route('register.form') }}">Book Appointment</a>
