@@ -30,9 +30,30 @@
                     <option value="">Select date and dentist</option>
                 </select>
             </label>
-            <label>Reason
-                <input type="text" name="reason" placeholder="Cleaning, pain, checkup...">
-            </label>
+            <fieldset class="service-picker">
+                <legend>Services</legend>
+                <p class="service-picker-hint">Choose one or more services offered by the clinic.</p>
+                <div class="service-picker-groups">
+                    @foreach ($serviceMenu as $group)
+                        <div class="service-picker-group">
+                            <h3>{{ $group['category'] }}</h3>
+                            <div class="service-options">
+                                @foreach ($group['services'] as $service)
+                                    <label class="service-option">
+                                        <input type="checkbox" name="services[]" value="{{ $service['name'] }}">
+                                        <span>
+                                            <strong>{{ $service['name'] }}</strong>
+                                            @if (!empty($service['sub_services']))
+                                                <small>{{ implode(' • ', $service['sub_services']) }}</small>
+                                            @endif
+                                        </span>
+                                    </label>
+                                @endforeach
+                            </div>
+                        </div>
+                    @endforeach
+                </div>
+            </fieldset>
             <button class="btn" type="submit">Book Now</button>
         </form>
     </article>
@@ -45,13 +66,17 @@
                     <div>
                         <strong>{{ $appointment->scheduled_for->format('M d, Y h:i A') }}</strong>
                         <p>with Dr. {{ $appointment->dentist->name }} | {{ ucfirst($appointment->status) }}</p>
+                        @if (!empty($appointment->services))
+                            <p class="appointment-services">Services: {{ implode(', ', $appointment->services) }}</p>
+                        @endif
                     </div>
                     <div class="stack-actions">
                         <button type="button" 
                                 class="btn btn-ghost"
                                 data-dentist-id="{{ $appointment->dentist_id }}"
+                                data-services='@json($appointment->services ?? [])'
                                 data-action-url="{{ route('patient.appointments.reschedule', $appointment) }}"
-                                onclick="openRescheduleModal(this.dataset.dentistId, this.dataset.actionUrl)">
+                                onclick="openRescheduleModal(this.dataset.dentistId, this.dataset.actionUrl, this.dataset.services)">
                             Reschedule
                         </button>
                         <form method="POST" action="{{ route('patient.appointments.cancel', $appointment) }}">
@@ -88,10 +113,31 @@
                     <option value="">Select date first</option>
                 </select>
             </label>
-            
-            <label>Reason for change
-                <input type="text" name="reason" placeholder="E.g., schedule conflict...">
-            </label>
+
+            <fieldset class="service-picker">
+                <legend>Services</legend>
+                <p class="service-picker-hint">Select the services to keep for this appointment.</p>
+                <div class="service-picker-groups">
+                    @foreach ($serviceMenu as $group)
+                        <div class="service-picker-group">
+                            <h3>{{ $group['category'] }}</h3>
+                            <div class="service-options">
+                                @foreach ($group['services'] as $service)
+                                    <label class="service-option">
+                                        <input type="checkbox" name="services[]" value="{{ $service['name'] }}">
+                                        <span>
+                                            <strong>{{ $service['name'] }}</strong>
+                                            @if (!empty($service['sub_services']))
+                                                <small>{{ implode(' • ', $service['sub_services']) }}</small>
+                                            @endif
+                                        </span>
+                                    </label>
+                                @endforeach
+                            </div>
+                        </div>
+                    @endforeach
+                </div>
+            </fieldset>
 
             <div class="inline-form" style="justify-content: flex-end;">
                 <button type="button" class="btn btn-ghost" onclick="document.getElementById('reschedule-modal').close()">Cancel</button>
@@ -107,7 +153,12 @@
         <div class="list">
             @forelse ($history as $appointment)
                 <div class="list-item">
-                    <span>{{ $appointment->scheduled_for->format('M d, Y h:i A') }} with Dr. {{ $appointment->dentist->name }}</span>
+                    <div>
+                        <span>{{ $appointment->scheduled_for->format('M d, Y h:i A') }} with Dr. {{ $appointment->dentist->name }}</span>
+                        @if (!empty($appointment->services))
+                            <p class="appointment-services">Services: {{ implode(', ', $appointment->services) }}</p>
+                        @endif
+                    </div>
                     <span class="chip chip-{{ $appointment->status }}">{{ ucfirst($appointment->status) }}</span>
                 </div>
             @empty
@@ -146,6 +197,17 @@
     const rescheduleDate = document.getElementById('reschedule-date');
     const rescheduleSlot = document.getElementById('reschedule-slot');
     const rescheduleDentistId = document.getElementById('reschedule-dentist-id');
+    const serviceCheckboxes = () => Array.from(document.querySelectorAll('input[name="services[]"]'));
+
+    function setServices(selectedServices) {
+        const normalized = Array.isArray(selectedServices)
+            ? selectedServices
+            : (selectedServices ? JSON.parse(selectedServices) : []);
+
+        serviceCheckboxes().forEach((checkbox) => {
+            checkbox.checked = normalized.includes(checkbox.value);
+        });
+    }
 
     async function loadSlots() {
         if (!dentistSelect.value || !dateSelect.value) {
@@ -179,11 +241,12 @@
     dateSelect.addEventListener('change', loadSlots);
 
     // Reschedule Logic
-    window.openRescheduleModal = function(dentistId, actionUrl) {
+    window.openRescheduleModal = function(dentistId, actionUrl, services) {
         rescheduleForm.action = actionUrl;
         rescheduleDentistId.value = dentistId;
         rescheduleDate.value = '';
         rescheduleSlot.innerHTML = '<option value="">Select date first</option>';
+        setServices(services);
         rescheduleModal.showModal();
     };
 

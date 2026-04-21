@@ -9,6 +9,7 @@ use App\Models\User;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Support\Facades\Auth;
 
 class AppointmentApiController extends Controller
 {
@@ -48,7 +49,7 @@ class AppointmentApiController extends Controller
             'dentist_id' => $request->integer('dentist_id'),
             'scheduled_for' => $scheduled,
             'ends_at' => $scheduled->copy()->addMinutes(30),
-            'reason' => $request->input('reason'),
+            'services' => $request->input('services', []),
             'status' => 'pending',
         ]);
 
@@ -65,7 +66,8 @@ class AppointmentApiController extends Controller
         $validated = $request->validate([
             'status' => ['nullable', 'in:pending,confirmed,completed,canceled'],
             'scheduled_for' => ['nullable', 'date'],
-            'reason' => ['nullable', 'string', 'max:255'],
+            'services' => ['nullable', 'array'],
+            'services.*' => ['string'],
         ]);
 
         if (isset($validated['scheduled_for'])) {
@@ -94,7 +96,7 @@ class AppointmentApiController extends Controller
     {
         $appointment->update([
             'status' => 'canceled',
-            'canceled_by' => auth()->id(),
+            'canceled_by' => Auth::id(),
             'cancellation_reason' => 'Canceled via API',
         ]);
 

@@ -142,6 +142,122 @@ body::after {
     flex-wrap: wrap;
 }
 
+.topbar-actions.admin-actions {
+    width: 100%;
+}
+
+.topbar-admin-actions {
+    margin-left: auto;
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 0.55rem;
+    flex-wrap: wrap;
+    width: 100%;
+}
+
+.admin-greeting {
+    font-weight: 800;
+    color: var(--teal-dark);
+    white-space: nowrap;
+}
+
+.admin-menu {
+    position: relative;
+}
+
+.admin-menu-toggle {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.45rem;
+    border: 1px solid #b8d2dc;
+    border-radius: 999px;
+    background: #f6fcfe;
+    padding: 0.33rem 0.75rem;
+    cursor: pointer;
+    font: inherit;
+}
+
+.admin-menu-arrow {
+    color: #2f5a68;
+    font-size: 0.72rem;
+}
+
+.admin-menu-panel {
+    position: absolute;
+    right: 0;
+    top: calc(100% + 8px);
+    min-width: 220px;
+    background: #ffffff;
+    border: 1px solid #cfe1e8;
+    border-radius: 12px;
+    box-shadow: var(--shadow-sm);
+    padding: 0.35rem;
+    display: none;
+    z-index: 35;
+}
+
+.admin-menu.is-open .admin-menu-panel {
+    display: block;
+}
+
+.admin-menu-item {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    text-decoration: none;
+    color: #2f5a68;
+    border-radius: 10px;
+    padding: 0.45rem 0.55rem;
+    font-weight: 700;
+    font-size: 0.86rem;
+}
+
+.admin-menu-item:hover {
+    background: #eff8fb;
+    color: var(--teal-dark);
+}
+
+.admin-menu-icon {
+    width: 1rem;
+    height: 1rem;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    color: #3a6573;
+}
+
+.admin-menu-icon svg {
+    width: 1rem;
+    height: 1rem;
+}
+
+.account-toast {
+    position: fixed;
+    top: 1rem;
+    right: 1rem;
+    z-index: 60;
+    min-width: 260px;
+    max-width: min(420px, calc(100vw - 2rem));
+    box-shadow: var(--shadow-md);
+    animation: toast-slide-in 180ms ease-out;
+}
+
+@keyframes toast-slide-in {
+    from {
+        opacity: 0;
+        transform: translateY(-8px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.topbar-actions.admin-actions .topbar-admin-actions {
+    margin-left: auto;
+}
+
 .role-nav {
     display: flex;
     gap: 0.45rem;
@@ -162,6 +278,31 @@ body::after {
 .role-link:hover {
     border-color: var(--teal);
     color: var(--teal-dark);
+}
+
+.logout-link {
+    color: #c53a3a;
+    border-color: rgba(197, 58, 58, 0.22);
+    background: #fff7f7;
+    cursor: pointer;
+    font: inherit;
+}
+
+.logout-link:hover {
+    color: #9e2323;
+    border-color: rgba(197, 58, 58, 0.44);
+    background: #fff0f0;
+}
+
+.logout-link:focus-visible {
+    outline: 2px solid rgba(197, 58, 58, 0.45);
+    outline-offset: 2px;
+}
+
+@media (min-width: 900px) {
+    .topbar-admin-actions {
+        width: auto;
+    }
 }
 
 .content-flow {
@@ -340,6 +481,23 @@ textarea {
     box-shadow: 0 10px 16px rgba(204, 81, 81, 0.24);
 }
 
+.btn-icon {
+    gap: 0.4rem;
+}
+
+.btn-icon-svg {
+    width: 1rem;
+    height: 1rem;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.btn-icon-svg svg {
+    width: 1rem;
+    height: 1rem;
+}
+
 .list {
     display: grid;
     gap: 0.6rem;
@@ -367,6 +525,72 @@ textarea {
     padding-right: 0.25rem;
 }
 
+.dentist-table-wrap {
+    overflow-x: auto;
+}
+
+.dentist-table {
+    width: 100%;
+    min-width: 900px;
+    border-collapse: collapse;
+}
+
+.dentist-table th {
+    text-align: left;
+    color: #2f5a68;
+    font-size: 0.78rem;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    padding: 0.75rem 0.6rem;
+    border-bottom: 1px solid #d6e5ea;
+    background: #f7fcfd;
+}
+
+.dentist-table td {
+    padding: 0.7rem 0.6rem;
+    vertical-align: middle;
+    border-bottom: 1px solid #e7f1f4;
+}
+
+.dentist-actions-cell {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 0.45rem;
+    white-space: nowrap;
+}
+
+.dentist-actions-cell form {
+    margin: 0;
+}
+
+.dentist-edit-dialog {
+    width: min(680px, 92vw);
+    border: 1px solid #bfd7df;
+    border-radius: 16px;
+    padding: 1rem;
+    box-shadow: 0 24px 40px rgba(16, 49, 59, 0.25);
+}
+
+.dentist-edit-dialog::backdrop {
+    background: rgba(13, 46, 56, 0.45);
+}
+
+.dentist-edit-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 0.75rem;
+}
+
+.dentist-edit-head h3 {
+    margin: 0;
+}
+
+.dentist-edit-form textarea {
+    min-height: 90px;
+}
+
 .chip {
     border: 1px solid #c3d8e0;
     background: #f2fbff;
@@ -387,6 +611,377 @@ textarea {
     font-size: clamp(1.7rem, 4vw, 2.35rem);
     font-weight: 800;
     color: var(--teal-dark);
+}
+
+.dentist-kpi {
+    position: relative;
+    display: inline-block;
+    cursor: pointer;
+    outline: none;
+}
+
+.dentist-kpi:focus-visible {
+    border-radius: 8px;
+    box-shadow: 0 0 0 3px rgba(47, 102, 168, 0.24);
+}
+
+.dentist-kpi-tooltip {
+    position: absolute;
+    left: 0;
+    top: calc(100% + 10px);
+    z-index: 20;
+    min-width: 280px;
+    max-width: min(420px, calc(100vw - 48px));
+    max-height: 260px;
+    overflow: auto;
+    padding: 0.75rem;
+    border-radius: var(--radius-md);
+    border: 1px solid #bcd4de;
+    background: #ffffff;
+    box-shadow: 0 14px 28px rgba(18, 57, 70, 0.24);
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(-4px);
+    transition: opacity 0.14s ease, transform 0.14s ease, visibility 0.14s ease;
+}
+
+.dentist-kpi-tooltip::before {
+    content: '';
+    position: absolute;
+    top: -7px;
+    left: 24px;
+    width: 12px;
+    height: 12px;
+    border-left: 1px solid #bcd4de;
+    border-top: 1px solid #bcd4de;
+    background: #ffffff;
+    transform: rotate(45deg);
+}
+
+.dentist-kpi:hover .dentist-kpi-tooltip,
+.dentist-kpi:focus-within .dentist-kpi-tooltip,
+.dentist-kpi:focus .dentist-kpi-tooltip,
+.dentist-kpi.is-open .dentist-kpi-tooltip {
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(0);
+}
+
+.dentist-kpi-item {
+    display: flex;
+    justify-content: space-between;
+    gap: 0.75rem;
+    padding: 0.5rem 0.25rem;
+    border-bottom: 1px solid #e8f1f5;
+}
+
+.dentist-kpi-item:last-child {
+    border-bottom: none;
+}
+
+.dentist-kpi-item strong {
+    color: var(--teal-dark);
+}
+
+.dentist-kpi-item span {
+    color: #365868;
+    text-align: right;
+}
+
+.dentist-kpi-empty {
+    margin: 0;
+    color: #5d7d89;
+}
+
+.reservation-kpi {
+    position: relative;
+    display: inline-block;
+    cursor: pointer;
+    outline: none;
+}
+
+.reservation-kpi:focus-visible {
+    border-radius: 8px;
+    box-shadow: 0 0 0 3px rgba(47, 102, 168, 0.24);
+}
+
+.reservation-kpi-tooltip {
+    position: absolute;
+    left: 0;
+    top: calc(100% + 10px);
+    z-index: 20;
+    min-width: 280px;
+    max-width: min(420px, calc(100vw - 48px));
+    max-height: 260px;
+    overflow: auto;
+    padding: 0.75rem;
+    border-radius: var(--radius-md);
+    border: 1px solid #bcd4de;
+    background: #ffffff;
+    box-shadow: 0 14px 28px rgba(18, 57, 70, 0.24);
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(-4px);
+    transition: opacity 0.14s ease, transform 0.14s ease, visibility 0.14s ease;
+}
+
+.reservation-kpi-tooltip::before {
+    content: '';
+    position: absolute;
+    top: -7px;
+    left: 24px;
+    width: 12px;
+    height: 12px;
+    border-left: 1px solid #bcd4de;
+    border-top: 1px solid #bcd4de;
+    background: #ffffff;
+    transform: rotate(45deg);
+}
+
+.reservation-kpi:hover .reservation-kpi-tooltip,
+.reservation-kpi:focus-within .reservation-kpi-tooltip,
+.reservation-kpi:focus .reservation-kpi-tooltip,
+.reservation-kpi.is-open .reservation-kpi-tooltip {
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(0);
+}
+
+.reservation-kpi-item {
+    display: flex;
+    justify-content: space-between;
+    gap: 0.75rem;
+    padding: 0.5rem 0.25rem;
+    border-bottom: 1px solid #e8f1f5;
+}
+
+.reservation-kpi-item:last-child {
+    border-bottom: none;
+}
+
+.reservation-kpi-item strong {
+    color: var(--teal-dark);
+}
+
+.reservation-kpi-item span {
+    color: #365868;
+    text-align: right;
+}
+
+.reservation-kpi-empty {
+    margin: 0;
+    color: #5d7d89;
+}
+
+.service-analytics-card {
+    display: grid;
+    gap: 1rem;
+}
+
+.service-analytics-head {
+    display: flex;
+    justify-content: space-between;
+    align-items: end;
+    gap: 1rem;
+    flex-wrap: wrap;
+}
+
+.service-analytics-head h2 {
+    margin-bottom: 0.3rem;
+}
+
+.service-analytics-head p {
+    margin: 0;
+}
+
+.service-analytics-period {
+    margin-top: 0.35rem;
+    font-size: 0.9rem;
+    font-weight: 700;
+    color: #2b5564;
+}
+
+.service-period-form {
+    display: flex;
+    align-items: end;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+}
+
+.service-analytics-controls {
+    display: grid;
+    gap: 0.55rem;
+    justify-items: end;
+}
+
+.service-export-btn {
+    white-space: nowrap;
+}
+
+.service-export-actions {
+    display: flex;
+    gap: 0.45rem;
+    flex-wrap: wrap;
+    justify-content: flex-end;
+}
+
+.service-period-form label {
+    font-size: 0.78rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: #3d6776;
+}
+
+.service-period-form select {
+    width: auto;
+    min-width: 170px;
+}
+
+.service-analytics-canvas-wrap {
+    height: 420px;
+    padding: 0.5rem;
+    border: 1px solid #d8e8ee;
+    border-radius: 14px;
+    background: linear-gradient(180deg, #fbfeff 0%, #f3fafc 100%);
+}
+
+.service-legend {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.65rem;
+}
+
+.service-legend-item {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    border: 1px solid #d3e4ea;
+    border-radius: 999px;
+    padding: 0.28rem 0.62rem;
+    background: #f8fdff;
+    color: #2e5462;
+    font-size: 0.82rem;
+    font-weight: 700;
+}
+
+.service-legend-swatch {
+    width: 0.78rem;
+    height: 0.78rem;
+    border-radius: 999px;
+    border: 1px solid rgba(10, 45, 56, 0.16);
+}
+
+.service-analytics-empty {
+    margin: 0;
+    color: #567583;
+}
+
+.reservation-trend-card {
+    display: grid;
+    gap: 0.85rem;
+}
+
+.reservation-trend-head {
+    display: flex;
+    align-items: end;
+    justify-content: space-between;
+    gap: 0.8rem;
+    flex-wrap: wrap;
+}
+
+.reservation-trend-controls {
+    display: grid;
+    gap: 0.55rem;
+    justify-items: end;
+}
+
+.reservation-trend-head h2 {
+    margin-bottom: 0.3rem;
+}
+
+.reservation-trend-head p {
+    margin: 0;
+}
+
+.reservation-trend-canvas-wrap {
+    height: 360px;
+    padding: 0.45rem;
+    border: 1px solid #d7e8ee;
+    border-radius: 14px;
+    background: linear-gradient(180deg, #fcfeff 0%, #f2f8fb 100%);
+}
+
+.service-picker {
+    margin: 0;
+    padding: 1rem;
+    border: 1px solid #d8e6eb;
+    border-radius: var(--radius-md);
+    background: #f8fcfd;
+}
+
+.service-picker legend {
+    padding: 0 0.35rem;
+    font-weight: 800;
+    color: var(--teal-dark);
+}
+
+.service-picker-hint {
+    margin: 0.25rem 0 0.9rem;
+    color: #4d6b76;
+    font-size: 0.92rem;
+}
+
+.service-picker-groups {
+    display: grid;
+    gap: 1rem;
+}
+
+.service-picker-group h3 {
+    margin: 0 0 0.5rem;
+    font-size: 0.95rem;
+    color: #244956;
+}
+
+.service-options {
+    display: grid;
+    gap: 0.55rem;
+}
+
+.service-option {
+    display: flex;
+    gap: 0.7rem;
+    align-items: flex-start;
+    padding: 0.72rem 0.8rem;
+    border: 1px solid #d7e7ec;
+    border-radius: 14px;
+    background: #ffffff;
+    cursor: pointer;
+}
+
+.service-option input {
+    margin-top: 0.2rem;
+    width: 1rem;
+    height: 1rem;
+    accent-color: var(--teal);
+    flex-shrink: 0;
+}
+
+.service-option strong {
+    display: block;
+    color: #183640;
+}
+
+.service-option small {
+    display: block;
+    margin-top: 0.2rem;
+    color: #5d7d89;
+    line-height: 1.35;
+}
+
+.appointment-services {
+    margin: 0.35rem 0 0;
+    color: #4c6d78;
+    font-size: 0.92rem;
 }
 
 .hero-mountain {
@@ -844,6 +1439,10 @@ dialog::backdrop {
         width: 100%;
     }
 
+    .dentist-actions-cell {
+        justify-content: flex-start;
+    }
+
     .weekday-grid {
         grid-template-columns: repeat(4, minmax(0, 1fr));
     }
@@ -854,5 +1453,37 @@ dialog::backdrop {
 
     .availability-actions {
         grid-template-columns: 1fr;
+    }
+
+    .service-analytics-canvas-wrap {
+        height: 340px;
+        padding: 0.35rem;
+    }
+
+    .reservation-trend-canvas-wrap {
+        height: 320px;
+        padding: 0.35rem;
+    }
+
+    .reservation-trend-head .service-export-btn {
+        width: 100%;
+    }
+
+    .reservation-trend-controls {
+        width: 100%;
+    }
+
+    .service-period-form select,
+    .service-period-form .btn {
+        width: 100%;
+    }
+
+    .service-analytics-controls,
+    .service-export-btn {
+        width: 100%;
+    }
+
+    .service-export-actions {
+        width: 100%;
     }
 }

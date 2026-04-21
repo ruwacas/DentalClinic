@@ -18,6 +18,7 @@ class Appointment extends Model
         'ends_at',
         'status',
         'reason',
+        'services',
         'treatment_details',
         'rescheduled_from_id',
         'canceled_by',
@@ -29,6 +30,7 @@ class Appointment extends Model
         return [
             'scheduled_for' => 'datetime',
             'ends_at' => 'datetime',
+            'services' => 'array',
         ];
     }
 

@@ -8,6 +8,7 @@ use App\Http\Requests\StoreAppointmentRequest;
 use App\Jobs\NotifyDentistOfReschedule;
 use App\Models\Appointment;
 use App\Models\ClinicNotification;
+use App\Models\Service;
 use App\Models\User;
 use Carbon\Carbon;
 use Illuminate\Http\JsonResponse;
@@ -20,6 +21,20 @@ class AppointmentController extends Controller
     public function dashboard(Request $request): View
     {
         $user = $request->user();
+        $serviceMenu = Service::query()
+            ->orderBy('category')
+            ->orderBy('name')
+            ->get()
+            ->groupBy('category')
+            ->map(fn ($services, $category) => [
+                'category' => $category,
+                'services' => $services->map(fn ($service) => [
+                    'name' => $service->name,
+                    'sub_services' => [],
+                ])->values()->all(),
+            ])
+            ->values()
+            ->all();
 
         $upcoming = Appointment::with('dentist')
             ->where('patient_id', $user->id)
@@ -42,7 +57,7 @@ class AppointmentController extends Controller
 
         $notifications = $user->notificationsFeed()->latest()->limit(10)->get();
 
-        return view('patient.dashboard', compact('user', 'upcoming', 'history', 'dentists', 'notifications'));
+        return view('patient.dashboard', compact('user', 'upcoming', 'history', 'dentists', 'notifications', 'serviceMenu'));
     }
 
     public function profile(Request $request): View
@@ -177,7 +192,7 @@ class AppointmentController extends Controller
             'dentist_id' => $request->integer('dentist_id'),
             'scheduled_for' => $scheduled,
             'ends_at' => $endsAt,
-            'reason' => $request->input('reason'),
+            'services' => $request->input('services', []),
             'status' => 'pending',
         ]);
 
@@ -222,7 +237,7 @@ class AppointmentController extends Controller
             'dentist_id' => $request->integer('dentist_id'),
             'scheduled_for' => $newSlot,
             'ends_at' => $newSlot->copy()->addMinutes(30),
-            'reason' => $request->input('reason'),
+            'services' => $request->input('services', []),
             'status' => 'pending',
         ]);
 

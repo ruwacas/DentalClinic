@@ -6,7 +6,7 @@ Hello Dr. {{ $appointment->dentist->name }},
 Patient **{{ $appointment->patient->name }}** has rescheduled their appointment.
 
 **New Date & Time:** {{ $appointment->scheduled_for->format('F j, Y, g:i a') }}
-**Reason for Change:** {{ $appointment->reason ?? 'No reason provided' }}
+**Services:** {{ !empty($appointment->services) ? implode(', ', $appointment->services) : 'No services selected' }}
 
 Please login to your dashboard to review this appointment.
 
