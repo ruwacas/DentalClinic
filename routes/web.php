@@ -48,6 +48,10 @@ Route::get('/dashboard', function () {
     };
 })->middleware('auth')->name('dashboard.redirect');
 
+Route::get('/dentist/appointments/{appointment}/status', fn () => redirect()->route('dashboard.redirect'))
+    ->middleware('auth')
+    ->name('dentist.appointments.status.guard');
+
 Route::middleware(['auth', 'role:patient'])->prefix('patient')->name('patient.')->group(function () {
     Route::get('/dashboard', [PatientAppointmentController::class, 'dashboard'])->name('dashboard');
     Route::get('/profile', [PatientAppointmentController::class, 'profile'])->name('profile');
@@ -64,7 +68,6 @@ Route::middleware(['auth', 'role:dentist'])->prefix('dentist')->name('dentist.')
     Route::post('/availability', [DentistDashboardController::class, 'saveAvailability'])->name('availability.store');
     Route::put('/availability/{availability}', [DentistDashboardController::class, 'updateAvailability'])->name('availability.update');
     Route::delete('/availability/{availability}', [DentistDashboardController::class, 'deleteAvailability'])->name('availability.delete');
-    Route::get('/appointments/{appointment}/status', fn () => redirect()->route('dentist.dashboard', ['view' => 'appointments']))->name('appointments.status.redirect');
     Route::put('/appointments/{appointment}/status', [DentistDashboardController::class, 'updateStatus'])->name('appointments.status');
     Route::post('/appointments/{appointment}/notes', [DentistDashboardController::class, 'addNote'])->name('appointments.notes');
 });
