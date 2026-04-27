@@ -23,7 +23,17 @@
             @auth
                 <div class="topbar-actions {{ auth()->user()->role === 'dentist' ? 'dentist-actions' : '' }} {{ auth()->user()->role === 'admin' ? 'admin-actions' : '' }}">
                     @if (auth()->user()->role === 'dentist')
-                        <p class="dentist-greeting dentist-greeting-right">Welcome! Dr. {{ strtoupper(auth()->user()->name) }}</p>
+                        <div class="dentist-account-left">
+                            <div class="dentist-account-text">
+                                <p class="dentist-account-kicker">Dentist Portal</p>
+                                <p class="dentist-account-title">Dentist Dashboard</p>
+                                <p class="dentist-greeting">Welcome! Dr. {{ auth()->user()->name }}</p>
+                            </div>
+                            <form method="POST" action="{{ route('logout') }}">
+                                @csrf
+                                <button class="role-link logout-link" type="submit">Logout</button>
+                            </form>
+                        </div>
                     @endif
                     @if (auth()->user()->role === 'patient')
                         <p class="patient-greeting patient-greeting-right">{{ auth()->user()->name }}</p>
@@ -64,12 +74,19 @@
                             </div>
                         </div>
                     @else
-                        <a class="role-link" href="{{ route('services') }}">Our Services</a>
+                        @if (auth()->user()->role === 'dentist')
+                            <a class="role-link dentist-left-link" href="{{ route('dentist.dashboard') }}">Dashboard</a>
+                        @endif
+                        <a class="role-link {{ auth()->user()->role === 'dentist' ? 'dentist-services-link' : '' }}" href="{{ route('services') }}">Our Services</a>
                     @endif
                     @if (auth()->user()->role === 'admin')
                         <a class="role-link" href="{{ route('admin.dentists.index') }}">Manage Dentist Account</a>
-                    @else
+                    @elseif (auth()->user()->role !== 'dentist')
                         <a class="role-link" href="{{ route('home') }}#location">Location</a>
+                    @endif
+                    @if (auth()->user()->role === 'dentist')
+                        <a class="role-link dentist-left-link" href="{{ route('dentist.dashboard', ['view' => 'availability']) }}#availability-form" target="_blank" rel="noopener noreferrer">Set Availability</a>
+                        <a class="role-link dentist-left-link" href="{{ route('dentist.dashboard', ['view' => 'appointments']) }}#appointments-panel" target="_blank" rel="noopener noreferrer">Update Appointments</a>
                     @endif
                     @if (auth()->user()->role !== 'dentist')
                         <nav class="role-nav">
@@ -111,7 +128,7 @@
                                 <button class="role-link logout-link" type="submit">Logout</button>
                             </form>
                         </div>
-                    @else
+                    @elseif (auth()->user()->role !== 'dentist')
                         <form method="POST" action="{{ route('logout') }}">
                             @csrf
                             <button class="btn btn-ghost" type="submit">Logout</button>

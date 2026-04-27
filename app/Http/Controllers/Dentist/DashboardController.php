@@ -31,19 +31,40 @@ class DashboardController extends Controller
 
         $appointments = Appointment::with('patient')
             ->where('dentist_id', $dentist->id)
+            ->whereIn('status', ['pending', 'confirmed'])
             ->orderBy('scheduled_for')
             ->get();
 
         $todayCount = Appointment::where('dentist_id', $dentist->id)
+            ->whereIn('status', ['pending', 'confirmed'])
             ->whereDate('scheduled_for', now()->toDateString())
             ->count();
+
+        $todayAppointments = Appointment::with('patient')
+            ->where('dentist_id', $dentist->id)
+            ->whereIn('status', ['pending', 'confirmed'])
+            ->whereDate('scheduled_for', now()->toDateString())
+            ->orderBy('scheduled_for')
+            ->get();
+
+        $upcomingCount = Appointment::where('dentist_id', $dentist->id)
+            ->whereIn('status', ['pending', 'confirmed'])
+            ->where('scheduled_for', '>', now())
+            ->count();
+
+        $upcomingAppointments = Appointment::with('patient')
+            ->where('dentist_id', $dentist->id)
+            ->whereIn('status', ['pending', 'confirmed'])
+            ->where('scheduled_for', '>', now())
+            ->orderBy('scheduled_for')
+            ->get();
 
         $availabilities = $dentist->availabilities()
             ->orderBy('day_of_week')
             ->orderBy('start_time')
             ->get();
 
-        return view('dentist.dashboard', compact('appointments', 'todayCount', 'dentist', 'availabilities'));
+        return view('dentist.dashboard', compact('appointments', 'todayCount', 'todayAppointments', 'upcomingCount', 'upcomingAppointments', 'dentist', 'availabilities'));
     }
 
     public function saveAvailability(Request $request): RedirectResponse

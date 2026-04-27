@@ -10,6 +10,7 @@ use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Auth;
+use Symfony\Component\HttpKernel\Exception\HttpException;
 
 class AppointmentApiController extends Controller
 {
@@ -33,7 +34,20 @@ class AppointmentApiController extends Controller
 
     public function store(StoreAppointmentRequest $request): JsonResponse
     {
+        if (! $request->user()->isPatient()) {
+            abort(403, 'Only patients can create appointments via this endpoint.');
+        }
+
         $scheduled = Carbon::parse($request->string('scheduled_for')->toString());
+
+        $availabilityError = $this->validateDentistCapacityAndSchedule(
+            $request->integer('dentist_id'),
+            $scheduled
+        );
+
+        if ($availabilityError !== null) {
+            return response()->json(['message' => $availabilityError], 422);
+        }
 
         $exists = Appointment::where('dentist_id', $request->integer('dentist_id'))
             ->where('scheduled_for', $scheduled)
@@ -58,11 +72,15 @@ class AppointmentApiController extends Controller
 
     public function show(Appointment $appointment): JsonResponse
     {
+        $this->authorizeAppointmentAccess(request(), $appointment);
+
         return response()->json($appointment->load(['patient', 'dentist', 'notes']));
     }
 
     public function update(Request $request, Appointment $appointment): JsonResponse
     {
+        $this->authorizeAppointmentAccess($request, $appointment);
+
         $validated = $request->validate([
             'status' => ['nullable', 'in:pending,confirmed,completed,canceled'],
             'scheduled_for' => ['nullable', 'date'],
@@ -70,8 +88,22 @@ class AppointmentApiController extends Controller
             'services.*' => ['string'],
         ]);
 
+        if ($request->user()->isPatient() && array_key_exists('status', $validated)) {
+            return response()->json(['message' => 'Patients cannot update appointment status.'], 403);
+        }
+
         if (isset($validated['scheduled_for'])) {
             $newTime = Carbon::parse($validated['scheduled_for']);
+
+            $availabilityError = $this->validateDentistCapacityAndSchedule(
+                $appointment->dentist_id,
+                $newTime,
+                $appointment->id
+            );
+
+            if ($availabilityError !== null) {
+                return response()->json(['message' => $availabilityError], 422);
+            }
 
             $exists = Appointment::where('dentist_id', $appointment->dentist_id)
                 ->where('scheduled_for', $newTime)
@@ -94,6 +126,8 @@ class AppointmentApiController extends Controller
 
     public function destroy(Appointment $appointment): JsonResponse
     {
+        $this->authorizeAppointmentAccess(request(), $appointment);
+
         $appointment->update([
             'status' => 'canceled',
             'canceled_by' => Auth::id(),
@@ -140,5 +174,67 @@ class AppointmentApiController extends Controller
         }
 
         return response()->json(['slots' => $slots]);
+    }
+
+    private function authorizeAppointmentAccess(Request $request, Appointment $appointment): void
+    {
+        $user = $request->user();
+
+        if (! $user) {
+            throw new HttpException(401, 'Unauthenticated.');
+        }
+
+        if ($user->isAdmin()) {
+            return;
+        }
+
+        $canAccess = ($user->isPatient() && $appointment->patient_id === $user->id)
+            || ($user->isDentist() && $appointment->dentist_id === $user->id);
+
+        if (! $canAccess) {
+            abort(403, 'You are not authorized to access this appointment.');
+        }
+    }
+
+    private function validateDentistCapacityAndSchedule(int $dentistId, Carbon $scheduled, ?int $ignoreAppointmentId = null): ?string
+    {
+        $dayOfWeek = (int) $scheduled->dayOfWeek;
+
+        $availabilities = User::findOrFail($dentistId)
+            ->availabilities()
+            ->where('day_of_week', $dayOfWeek)
+            ->where('is_active', true)
+            ->get();
+
+        if ($availabilities->isEmpty()) {
+            return 'Dentist is not available on the selected day.';
+        }
+
+        $slotIsWithinAvailability = $availabilities->contains(function ($availability) use ($scheduled) {
+            $start = Carbon::parse($scheduled->toDateString().' '.$availability->start_time);
+            $end = Carbon::parse($scheduled->toDateString().' '.$availability->end_time);
+
+            return $scheduled->greaterThanOrEqualTo($start) && $scheduled->lessThan($end);
+        });
+
+        if (! $slotIsWithinAvailability) {
+            return 'Selected time is outside the dentist availability window.';
+        }
+
+        $dailyCapacity = (int) $availabilities->sum('max_clients_per_day');
+
+        $dailyBookedQuery = Appointment::where('dentist_id', $dentistId)
+            ->whereDate('scheduled_for', $scheduled->toDateString())
+            ->whereIn('status', ['pending', 'confirmed']);
+
+        if ($ignoreAppointmentId !== null) {
+            $dailyBookedQuery->where('id', '!=', $ignoreAppointmentId);
+        }
+
+        if ($dailyBookedQuery->count() >= $dailyCapacity) {
+            return 'This dentist has reached the daily client limit for the selected date.';
+        }
+
+        return null;
     }
 }

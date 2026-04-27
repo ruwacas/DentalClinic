@@ -1,18 +1,91 @@
 @extends('layouts.app', ['title' => 'Dentist Dashboard'])
 
 @section('content')
-<section class="card patient-hero">
-    <div>
-        <p class="hero-kicker">Dentist Portal</p>
-        <h2>Dentist Dashboard</h2>
-        <p>Today appointments</p>
-        <p class="kpi-value">{{ $todayCount }}</p>
+<section class="card patient-hero dentist-hero">
+    <div class="dentist-hero-today">
+        <p class="hero-metric-label">Today Appointments</p>
+        <p class="kpi-value hero-metric-count">{{ $todayCount }}</p>
+        @if ($todayAppointments->isEmpty())
+            <p class="upcoming-empty-note">No appointments scheduled today.</p>
+        @else
+            <div class="today-mini-wrap">
+                <table class="today-mini-table">
+                    <colgroup>
+                        <col class="mini-col-patient">
+                        <col class="mini-col-date">
+                        <col class="mini-col-time">
+                        <col class="mini-col-services">
+                    </colgroup>
+                    <thead>
+                        <tr>
+                            <th>Patient Name</th>
+                            <th>Date</th>
+                            <th>Time</th>
+                            <th>Services</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach ($todayAppointments as $todayAppointment)
+                            <tr>
+                                <td>{{ $todayAppointment->patient->name }}</td>
+                                <td>{{ $todayAppointment->scheduled_for->format('M d, Y') }}</td>
+                                <td>{{ $todayAppointment->scheduled_for->format('h:i A') }}</td>
+                                <td>{{ ! empty($todayAppointment->services) ? implode(', ', $todayAppointment->services) : '-' }}</td>
+                            </tr>
+                        @endforeach
+                    </tbody>
+                </table>
+            </div>
+        @endif
+    </div>
+    <div class="dentist-hero-upcoming">
+        <p class="hero-metric-label">Upcoming Appointments</p>
+        <p class="kpi-value hero-metric-count">{{ $upcomingCount }}</p>
+        @if ($upcomingAppointments->isEmpty())
+            <p class="upcoming-empty-note">No upcoming appointments.</p>
+        @else
+            <div class="upcoming-mini-wrap">
+                <table class="upcoming-mini-table">
+                    <colgroup>
+                        <col class="mini-col-patient">
+                        <col class="mini-col-date">
+                        <col class="mini-col-time">
+                        <col class="mini-col-services">
+                    </colgroup>
+                    <thead>
+                        <tr>
+                            <th>Patient Name</th>
+                            <th>Date</th>
+                            <th>Time</th>
+                            <th>Services</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach ($upcomingAppointments as $upcomingAppointment)
+                            <tr>
+                                <td>{{ $upcomingAppointment->patient->name }}</td>
+                                <td>{{ $upcomingAppointment->scheduled_for->format('M d, Y') }}</td>
+                                <td>{{ $upcomingAppointment->scheduled_for->format('h:i A') }}</td>
+                                <td>{{ ! empty($upcomingAppointment->services) ? implode(', ', $upcomingAppointment->services) : '-' }}</td>
+                            </tr>
+                        @endforeach
+                    </tbody>
+                </table>
+            </div>
+        @endif
     </div>
 </section>
 
 <section class="grid two-col">
+    @php
+        $showAvailabilityPanel = request()->query('view') === 'availability'
+            || $errors->hasAny(['day_of_week', 'day_of_week.*', 'start_time', 'end_time', 'max_clients_per_day', 'is_active']);
+        $showAppointmentsPanel = request()->query('view') === 'appointments'
+            || $errors->hasAny(['status', 'treatment_details', 'cancellation_reason']);
+    @endphp
+    @if ($showAvailabilityPanel)
     <article class="card feature-card">
-        <h3>Add Availability</h3>
+        <h3>Set Availability</h3>
         <p>Choose one or more working days, then set your clinic hours.</p>
         @php
             $selectedDays = collect(old('day_of_week', []))
@@ -115,40 +188,57 @@
             @endforelse
         </div>
     </article>
+    @endif
 
-    <article class="card feature-card">
-        <h3>Appointments</h3>
-        <div class="list">
-            @forelse ($appointments as $appointment)
-                <div class="list-item block-item">
-                    <strong>{{ $appointment->scheduled_for->format('M d, Y h:i A') }}</strong>
-                    <p>Patient: {{ $appointment->patient->name }} | Status: {{ ucfirst($appointment->status) }}</p>
-                    <form method="POST" action="{{ route('dentist.appointments.status', $appointment) }}" class="inline-form">
-                        @csrf
-                        @method('PUT')
-                        <select name="status" required>
-                            <option value="pending">Pending</option>
-                            <option value="confirmed">Confirmed</option>
-                            <option value="completed">Completed</option>
-                            <option value="canceled">Canceled</option>
-                        </select>
-                        <input type="text" name="treatment_details" placeholder="Treatment details">
-                        <button class="btn" type="submit">Update</button>
-                    </form>
-                    <form method="POST" action="{{ route('dentist.appointments.notes', $appointment) }}" class="inline-form">
-                        @csrf
-                        <input type="text" name="note" placeholder="Add quick note" required>
-                        <button class="btn btn-ghost" type="submit">Add Note</button>
-                    </form>
-                </div>
-            @empty
+    @if ($showAppointmentsPanel)
+        <article class="card feature-card" id="appointments-panel">
+            <h3>Update Appointments</h3>
+            @if ($appointments->isEmpty())
                 <div class="empty-state">
                     <h4>No appointments assigned</h4>
                     <p>Your schedule is clear for now. Add availability to receive bookings.</p>
                 </div>
-            @endforelse
-        </div>
-    </article>
+            @else
+                <div class="dentist-table-wrap">
+                    <table class="dentist-table">
+                        <thead>
+                            <tr>
+                                <th>Patient Name</th>
+                                <th>Date</th>
+                                <th>Time</th>
+                                <th>Status</th>
+                                <th>Update Status</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach ($appointments as $appointment)
+                                <tr>
+                                    <td>{{ $appointment->patient->name }}</td>
+                                    <td>{{ $appointment->scheduled_for->format('M d, Y') }}</td>
+                                    <td>{{ $appointment->scheduled_for->format('h:i A') }}</td>
+                                    <td>{{ ucfirst($appointment->status) }}</td>
+                                    <td class="dentist-actions-cell">
+                                        <form method="POST" action="{{ route('dentist.appointments.status', $appointment) }}" class="inline-form">
+                                            @csrf
+                                            @method('PUT')
+                                            <select name="status" required>
+                                                <option value="pending" @selected($appointment->status === 'pending')>Pending</option>
+                                                <option value="confirmed" @selected($appointment->status === 'confirmed')>Confirmed</option>
+                                                <option value="completed" @selected($appointment->status === 'completed')>Completed</option>
+                                                <option value="canceled" @selected($appointment->status === 'canceled')>Canceled</option>
+                                            </select>
+                                            <input type="text" name="treatment_details" placeholder="Treatment details" value="{{ $appointment->treatment_details }}">
+                                            <button class="btn" type="submit">Update</button>
+                                        </form>
+                                    </td>
+                                </tr>
+                            @endforeach
+                        </tbody>
+                    </table>
+                </div>
+            @endif
+        </article>
+    @endif
 </section>
 
 <script>
@@ -156,6 +246,11 @@
         const form = document.getElementById('availability-form');
         const dayButtons = document.querySelectorAll('.day-btn');
         const selectedDaysContainer = document.getElementById('selected-days');
+
+        if (!form || !selectedDaysContainer) {
+            return;
+        }
+
         const selectedDays = new Set(
             Array.from(selectedDaysContainer.querySelectorAll('input[name="day_of_week[]"]')).map((input) => input.value)
         );

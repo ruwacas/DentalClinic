@@ -27,7 +27,11 @@ class StoreAppointmentRequest extends FormRequest
         $serviceOptions = Service::query()->pluck('name')->all();
 
         return [
-            'dentist_id' => ['required', 'integer', 'exists:users,id'],
+            'dentist_id' => [
+                'required',
+                'integer',
+                Rule::exists('users', 'id')->where(fn ($query) => $query->where('role', 'dentist')),
+            ],
             'scheduled_for' => ['required', 'date', 'after:now'],
             'services' => ['required', 'array', 'min:1'],
             'services.*' => ['string', Rule::in($serviceOptions)],
