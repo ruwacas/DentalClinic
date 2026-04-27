@@ -64,6 +64,7 @@ Route::middleware(['auth', 'role:dentist'])->prefix('dentist')->name('dentist.')
     Route::post('/availability', [DentistDashboardController::class, 'saveAvailability'])->name('availability.store');
     Route::put('/availability/{availability}', [DentistDashboardController::class, 'updateAvailability'])->name('availability.update');
     Route::delete('/availability/{availability}', [DentistDashboardController::class, 'deleteAvailability'])->name('availability.delete');
+    Route::get('/appointments/{appointment}/status', fn () => redirect()->route('dentist.dashboard', ['view' => 'appointments']))->name('appointments.status.redirect');
     Route::put('/appointments/{appointment}/status', [DentistDashboardController::class, 'updateStatus'])->name('appointments.status');
     Route::post('/appointments/{appointment}/notes', [DentistDashboardController::class, 'addNote'])->name('appointments.notes');
 });
