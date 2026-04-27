@@ -48,9 +48,13 @@ Route::get('/dashboard', function () {
     };
 })->middleware('auth')->name('dashboard.redirect');
 
-Route::get('/dentist/appointments/{appointment}/status', fn () => redirect()->route('dashboard.redirect'))
-    ->middleware('auth')
-    ->name('dentist.appointments.status.guard');
+Route::get('/dentist/appointments/{appointment}/status', function () {
+    if (! Auth::check()) {
+        return redirect()->route('login.form');
+    }
+
+    return redirect()->route('dashboard.redirect');
+})->name('dentist.appointments.status.guard');
 
 Route::middleware(['auth', 'role:patient'])->prefix('patient')->name('patient.')->group(function () {
     Route::get('/dashboard', [PatientAppointmentController::class, 'dashboard'])->name('dashboard');
