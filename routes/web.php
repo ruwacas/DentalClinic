@@ -81,7 +81,7 @@ Route::middleware(['auth', 'role:dentist'])->prefix('dentist')->name('dentist.')
 });
 
 Route::middleware(['auth', 'role:dentist,admin'])->prefix('dentist')->name('dentist.')->group(function () {
-    Route::put('/appointments/{appointment}/status', [DentistDashboardController::class, 'updateStatus'])->name('appointments.status');
+    Route::put('/appointments/{appointment}/update-status', [DentistDashboardController::class, 'updateStatus'])->name('appointments.status');
     Route::post('/appointments/{appointment}/notes', [DentistDashboardController::class, 'addNote'])->name('appointments.notes');
 });
 
