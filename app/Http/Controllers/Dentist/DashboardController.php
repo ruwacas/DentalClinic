@@ -10,6 +10,7 @@ use App\Models\Availability;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Validation\Rule;
 use Illuminate\View\View;
 
@@ -163,6 +164,15 @@ class DashboardController extends Controller
     public function updateStatus(UpdateAppointmentStatusRequest $request, Appointment $appointment): RedirectResponse
     {
         $user = $request->user();
+
+        Log::info('dentist appointment status update attempt', [
+            'request_method' => $request->method(),
+            'request_path' => $request->path(),
+            'user_id' => $user?->id,
+            'user_role' => $user?->role,
+            'appointment_id' => $appointment->id,
+            'appointment_dentist_id' => $appointment->dentist_id,
+        ]);
 
         abort_unless(
             $user->role === 'admin' || (int) $appointment->dentist_id === (int) $user->id,
