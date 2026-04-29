@@ -75,7 +75,7 @@ Route::middleware(['auth', 'role:dentist'])->prefix('dentist')->name('dentist.')
     Route::put('/availability/{availability}', [DentistDashboardController::class, 'updateAvailability'])->name('availability.update');
     Route::delete('/availability/{availability}', [DentistDashboardController::class, 'deleteAvailability'])->name('availability.delete');
     Route::get('/availability/{availability}', function (Request $request, Availability $availability) {
-        abort_unless($availability->dentist_id === $request->user()->id, 403);
+        abort_unless((int) $availability->dentist_id === (int) $request->user()->id, 403);
         return redirect()->route('dentist.dashboard', ['view' => 'availability']);
     })->name('availability.show');
 });

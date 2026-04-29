@@ -112,7 +112,7 @@ class DashboardController extends Controller
 
     public function updateAvailability(Request $request, Availability $availability): RedirectResponse
     {
-        abort_unless($availability->dentist_id === $request->user()->id, 403);
+        abort_unless((int) $availability->dentist_id === (int) $request->user()->id, 403);
 
         $dentistId = $request->user()->id;
 
@@ -146,7 +146,7 @@ class DashboardController extends Controller
 
     public function deleteAvailability(Request $request, Availability $availability): RedirectResponse
     {
-        abort_unless($availability->dentist_id === $request->user()->id, 403);
+        abort_unless((int) $availability->dentist_id === (int) $request->user()->id, 403);
 
         $availability->delete();
 
@@ -165,7 +165,7 @@ class DashboardController extends Controller
         $user = $request->user();
 
         abort_unless(
-            $user->role === 'admin' || $appointment->dentist_id === $user->id,
+            $user->role === 'admin' || (int) $appointment->dentist_id === (int) $user->id,
             403
         );
 
@@ -184,7 +184,7 @@ class DashboardController extends Controller
         $user = $request->user();
 
         abort_unless(
-            $user->role === 'admin' || $appointment->dentist_id === $user->id,
+            $user->role === 'admin' || (int) $appointment->dentist_id === (int) $user->id,
             403
         );
 
