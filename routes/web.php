@@ -7,7 +7,9 @@ use App\Http\Controllers\Admin\ServiceController as AdminServiceController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\Dentist\DashboardController as DentistDashboardController;
 use App\Http\Controllers\Patient\AppointmentController as PatientAppointmentController;
+use App\Models\Availability;
 use App\Models\Service;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 
@@ -72,10 +74,13 @@ Route::middleware(['auth', 'role:dentist'])->prefix('dentist')->name('dentist.')
     Route::post('/availability', [DentistDashboardController::class, 'saveAvailability'])->name('availability.store');
     Route::put('/availability/{availability}', [DentistDashboardController::class, 'updateAvailability'])->name('availability.update');
     Route::delete('/availability/{availability}', [DentistDashboardController::class, 'deleteAvailability'])->name('availability.delete');
-    Route::get('/availability/{availability}', function (Availability $availability) {
-        abort_unless($availability->dentist_id === auth()->id(), 403);
+    Route::get('/availability/{availability}', function (Request $request, Availability $availability) {
+        abort_unless($availability->dentist_id === $request->user()->id, 403);
         return redirect()->route('dentist.dashboard', ['view' => 'availability']);
     })->name('availability.show');
+});
+
+Route::middleware(['auth', 'role:dentist,admin'])->prefix('dentist')->name('dentist.')->group(function () {
     Route::put('/appointments/{appointment}/status', [DentistDashboardController::class, 'updateStatus'])->name('appointments.status');
     Route::post('/appointments/{appointment}/notes', [DentistDashboardController::class, 'addNote'])->name('appointments.notes');
 });

@@ -162,7 +162,12 @@ class DashboardController extends Controller
 
     public function updateStatus(UpdateAppointmentStatusRequest $request, Appointment $appointment): RedirectResponse
     {
-        abort_unless($appointment->dentist_id === $request->user()->id, 403);
+        $user = $request->user();
+
+        abort_unless(
+            $user->role === 'admin' || $appointment->dentist_id === $user->id,
+            403
+        );
 
         $appointment->update([
             'status' => $request->string('status')->toString(),
@@ -176,7 +181,12 @@ class DashboardController extends Controller
 
     public function addNote(Request $request, Appointment $appointment): RedirectResponse
     {
-        abort_unless($appointment->dentist_id === $request->user()->id, 403);
+        $user = $request->user();
+
+        abort_unless(
+            $user->role === 'admin' || $appointment->dentist_id === $user->id,
+            403
+        );
 
         $validated = $request->validate([
             'note' => ['required', 'string'],
@@ -184,7 +194,7 @@ class DashboardController extends Controller
 
         AppointmentNote::create([
             'appointment_id' => $appointment->id,
-            'dentist_id' => $request->user()->id,
+            'dentist_id' => $user->id,
             'note' => $validated['note'],
         ]);
 
